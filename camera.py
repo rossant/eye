@@ -54,20 +54,26 @@ class Canvas(app.Canvas):
     def on_draw(self, event):
         gloo.clear('black')
         img = self.webcam.get_image(self._surf)
-        im = pygame.surfarray.pixels3d(img)
+        im = pygame.surfarray.pixels3d(img)[...,0]
 
+        # IMS.append(im.copy())
         self.tracker.input(im)
 
         # Display eyes.
         for (x, y, w, h), c in zip(self.tracker.eyes, [0, 255]):
-            im[x:x+w,y:y+w,:] = c
+            im[x:x+w,y:y+w] = c
 
-        self.program['texture'][...] = im
+        self.program['texture'] = im
         self.program.draw('triangle_strip')
         
     def on_timer(self, event):
         self.update()
         
-c = Canvas()
-c.show()
-app.run()
+# IMS = []
+if __name__ == '__main__':
+    c = Canvas()
+    c.show()
+    app.run()
+
+    # X = np.dstack(IMS)
+    # np.save('images.npy', X)
