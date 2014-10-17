@@ -1,0 +1,4 @@
+.easyprofile/
+.ipynb_checkpoints/
+_old/
+*.pyc
