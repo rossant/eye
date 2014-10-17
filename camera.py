@@ -2,6 +2,7 @@ import pygame
 import pygame.camera
 import pygame.image
 import sys
+import cv2
 
 import numpy as np
 from vispy import app
@@ -40,6 +41,7 @@ class Canvas(app.Canvas):
         cameras = pygame.camera.list_cameras()
         self.webcam = pygame.camera.Camera(cameras[0])
         self.webcam.start()
+        self.face_cascade = cv2.CascadeClassifier('haarcascade_eye_tree_eyeglasses.xml')
         self._surf = pygame.Surface((640, 480))
 
         self._timer = app.Timer('auto', connect=self.on_timer, start=True)
@@ -52,6 +54,13 @@ class Canvas(app.Canvas):
         gloo.clear('black')
         img = self.webcam.get_image(self._surf)
         im = pygame.surfarray.pixels3d(img)
+
+        gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+        # print gray.shape
+        
+        for x, y, w, h in self.face_cascade.detectMultiScale(gray.T, 1.3):
+            im[x:x+w,y:y+w,:] = 0
+
         self.program['texture'][...] = im
         self.program.draw('triangle_strip')
         
